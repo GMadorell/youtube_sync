@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Checks if locally staged changes are formatted properly ignoring non-staged changes.
+# Source: https://gist.github.com/cvogt/2676ed6c6d1abafa3d6a
+
+PATH=$PATH:/usr/local/bin:/usr/local/sbin
+
+echo ""
+echo "Doing some Checks…"
+
+echo "* Moving to the project directory…"
+_DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+DIR=$( echo $_DIR | sed 's/\/.git\/hooks$//' )
+
+echo "* Stashing non-staged changes so we avoid checking them…"
+git diff --quiet
+hadNoNonStagedChanges=$?
+
+if ! [ $hadNoNonStagedChanges -eq 0 ]
+then
+	git stash --keep-index -u > /dev/null
+fi
+
+echo "* Checking pre test conditions…"
+sbt prep > /dev/null
+canRunTest=$?
+
+if [ $canRunTest -ne 0 ]
+then
+	echo "  [KO] Error checking pre test things"
+fi
+
+echo "* Applying the stash with the non-staged changes…"
+if ! [ $hadNoNonStagedChanges -eq 0 ]
+then
+	sleep 1 && git stash pop --index > /dev/null & # sleep because otherwise commit fails when this leads to a merge conflict
+fi
+
+# Final result
+echo ""
+
+if [ $canRunTest -eq 0 ]
+then
+    echo "[OK] Your code will be pushed young Padawan"
+    exit 0
+else
+    echo "[KO] Cancelling push due to test code style error (run 'sbt prep' for more information)"
+    exit 1
+fi
