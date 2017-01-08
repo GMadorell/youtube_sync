@@ -6,6 +6,7 @@ scalaVersion := "2.11.7"
 
 resourceDirectory in Compile := baseDirectory.value / "conf"
 
+libraryDependencies += "com.typesafe" % "config" % "1.3.1"
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 
 // Scalafmt
