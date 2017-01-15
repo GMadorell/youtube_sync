@@ -6,8 +6,8 @@ scalaVersion := "2.11.8"
 
 resourceDirectory in Compile := baseDirectory.value / "conf"
 
-libraryDependencies += "com.typesafe" % "config" % "1.2.1"
-libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
+libraryDependencies ++= Dependencies.compile
+libraryDependencies ++= Dependencies.test
 
 // Scalafmt
 formatSbtFiles in Compile := false
