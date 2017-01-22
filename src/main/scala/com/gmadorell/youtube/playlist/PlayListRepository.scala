@@ -1,4 +1,4 @@
-package com.gmadorell.api.playlist
+package com.gmadorell.youtube.playlist
 
 import scala.concurrent.Future
 
@@ -8,7 +8,7 @@ import io.circe.Decoder
 import io.circe.parser.decode
 import io.circe.generic.semiauto._
 import PlaylistsResponseMarshaller._
-import com.gmadorell.api.shared.YoutubeApiConstants
+import com.gmadorell.youtube.shared.YoutubeApiConstants
 import monix.execution.Scheduler
 
 trait PlayListRepository {

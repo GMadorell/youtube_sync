@@ -1,4 +1,13 @@
 
+file-system {
+  content-root-path = "/put/a/path/here"
+}
+
+context {
+  channels = []
+  playlists = []
+}
+
 youtube-api {
   api-key = "YOUR_API_KEY"
 }

@@ -1,4 +1,4 @@
-package com.gmadorell.api.video
+package com.gmadorell.youtube.video
 
 case class Video(videoId: VideoId)
 

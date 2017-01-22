@@ -1,4 +1,4 @@
-package com.gmadorell.api.video
+package com.gmadorell.youtube.video
 
 import scala.concurrent.Future
 
