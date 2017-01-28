@@ -1,4 +1,4 @@
-package com.gmadorell.youtube.playlist
+package com.gmadorell.youtube.model
 
 case class PlayList(id: PlayListId)
 

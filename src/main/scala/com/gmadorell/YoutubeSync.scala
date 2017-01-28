@@ -4,8 +4,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 
 import com.gmadorell.youtube.YoutubeApi
-import com.gmadorell.youtube.channel.ChannelId
-import com.gmadorell.youtube.playlist.PlayListId
+import com.gmadorell.youtube.model.{ChannelId, PlayListId}
 import com.gmadorell.youtube_sync.infrastructure.configuration.Configuration
 import com.typesafe.config.ConfigFactory
 import monix.execution.Scheduler.Implicits.global

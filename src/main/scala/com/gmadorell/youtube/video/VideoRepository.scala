@@ -3,32 +3,25 @@ package com.gmadorell.youtube.video
 import scala.concurrent.Future
 
 import PlaylistItemsResponseMarshaller._
-import com.gmadorell.api.playlist.PlayListId
-import com.gmadorell.api.shared.YoutubeApiConstants
-import fr.hmil.roshttp.{HttpRequest, Method, Protocol}
+import com.gmadorell.youtube.model.{PlayListId, Video, VideoId}
+import com.gmadorell.youtube.shared.YoutubeRequest
+import fr.hmil.roshttp.HttpRequest
 import io.circe.Decoder
 import io.circe.parser.decode
 import monix.execution.Scheduler
 import io.circe.generic.semiauto._
 
-trait VideoRepository {
-  def videos(playListId: PlayListId): Future[Set[Video]]
-}
-
-final class RosVideoRepository(apiKey: String)(implicit scheduler: Scheduler) extends VideoRepository {
-  private val requestSqueleton = HttpRequest()
-    .withProtocol(Protocol.HTTPS)
-    .withHost(YoutubeApiConstants.host)
+final class VideoSearcher(apiKey: String)(implicit scheduler: Scheduler) {
+  private val requestSkeleton = YoutubeRequest.baseRequest
     .withPath("playlistItems")
     .withQueryParameters(
       "part"       -> "contentDetails",
       "key"        -> apiKey,
       "maxResults" -> "50"
     )
-    .withMethod(Method.GET)
 
-  override def videos(playListId: PlayListId): Future[Set[Video]] = {
-    val requestWithPlayListId = requestSqueleton.withQueryParameter("playlistId", playListId.id)
+  def videos(playListId: PlayListId): Future[Set[Video]] = {
+    val requestWithPlayListId = requestSkeleton.withQueryParameter("playlistId", playListId.id)
 
     def responsePlayListItemToVideo(responsePlaylistItemsItem: Item): Video =
       Video(VideoId(responsePlaylistItemsItem.contentDetails.videoId))
@@ -70,7 +63,7 @@ private object PlaylistItemsResponseMarshaller {
   case class ItemContentDetails(videoId: String, videoPublishedAt: Option[String])
 
   implicit val itemContentDetailsDecoder: Decoder[ItemContentDetails]   = deriveDecoder
-  implicit val reponsePlaylistItemDecoder: Decoder[Item]                = deriveDecoder
+  implicit val responsePlaylistItemDecoder: Decoder[Item]               = deriveDecoder
   implicit val responsePageInfoDecoder: Decoder[PageInfo]               = deriveDecoder
   implicit val playlistsResponseDecoder: Decoder[PlaylistItemsResponse] = deriveDecoder
 }

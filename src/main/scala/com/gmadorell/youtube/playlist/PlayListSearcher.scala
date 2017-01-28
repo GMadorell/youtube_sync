@@ -2,33 +2,26 @@ package com.gmadorell.youtube.playlist
 
 import scala.concurrent.Future
 
-import com.gmadorell.api.channel.ChannelId
 import fr.hmil.roshttp.{HttpRequest, Method, Protocol}
 import io.circe.Decoder
 import io.circe.parser.decode
 import io.circe.generic.semiauto._
 import PlaylistsResponseMarshaller._
-import com.gmadorell.youtube.shared.YoutubeApiConstants
+import com.gmadorell.youtube.model.{ChannelId, PlayList, PlayListId}
+import com.gmadorell.youtube.shared.YoutubeRequest
 import monix.execution.Scheduler
 
-trait PlayListRepository {
-  def playLists(channelId: ChannelId): Future[Set[PlayList]]
-}
-
-final class RosPlayListRepository(apiKey: String)(implicit scheduler: Scheduler) extends PlayListRepository {
-  private val requestSqueleton = HttpRequest()
-    .withProtocol(Protocol.HTTPS)
-    .withHost(YoutubeApiConstants.host)
+final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
+  private val requestSkeleton = YoutubeRequest.baseRequest
     .withPath("playlists")
     .withQueryParameters(
       "part"       -> "id,status",
       "key"        -> apiKey,
       "maxResults" -> "20"
     )
-    .withMethod(Method.GET)
 
-  override def playLists(channelId: ChannelId): Future[Set[PlayList]] = {
-    val requestWithChannelId = requestSqueleton.withQueryParameter("channelId", channelId.id)
+  def playLists(channelId: ChannelId): Future[Set[PlayList]] = {
+    val requestWithChannelId = requestSkeleton.withQueryParameter("channelId", channelId.id)
 
     def responsePlayListItemToPlaylist(responsePlaylistItem: ResponsePlaylistItem): PlayList =
       PlayList(PlayListId(responsePlaylistItem.id))

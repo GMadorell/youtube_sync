@@ -2,14 +2,14 @@ package com.gmadorell.youtube
 
 import scala.concurrent.Future
 
-import com.gmadorell.youtube.channel.ChannelId
-import com.gmadorell.youtube.playlist.{PlayList, PlayListId, RosPlayListRepository}
-import com.gmadorell.youtube.video.{RosVideoRepository, Video}
+import com.gmadorell.youtube.model.{ChannelId, PlayList, PlayListId, Video}
+import com.gmadorell.youtube.playlist.PlayListSearcher
+import com.gmadorell.youtube.video.VideoSearcher
 import monix.execution.Scheduler
 
 final class YoutubeApi(private val apiKey: String)(implicit scheduler: Scheduler) {
-  private val playListsRepository = new RosPlayListRepository(apiKey)
-  private val videoRepository     = new RosVideoRepository(apiKey)
+  private val playListsRepository = new PlayListSearcher(apiKey)
+  private val videoRepository     = new VideoSearcher(apiKey)
 
   def playLists(channelId: ChannelId): Future[Set[PlayList]] = playListsRepository.playLists(channelId)
   def videos(playListId: PlayListId): Future[Set[Video]]     = videoRepository.videos(playListId)
