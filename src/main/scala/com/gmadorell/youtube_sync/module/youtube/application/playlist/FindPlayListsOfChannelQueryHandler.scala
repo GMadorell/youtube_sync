@@ -1,5 +1,16 @@
 package com.gmadorell.youtube_sync.module.youtube.application.playlist
 
-class FindPlayListsOfChannelQueryHandler(playListRepository: PlayListRepository) {}
+import scala.concurrent.{ExecutionContext, Future}
 
-trait PlayListRepository
+import com.gmadorell.bus.domain.QueryHandler
+import com.gmadorell.youtube_sync.module.youtube.domain.PlayListRepository
+import com.gmadorell.youtube_sync.module.youtube.domain.model.ChannelId
+
+final class FindPlayListsOfChannelQueryHandler(repository: PlayListRepository)(implicit ec: ExecutionContext)
+    extends QueryHandler[FindPlayListsOfChannelQuery, FindPlayListsOfChannelResponse] {
+  override def handle(query: FindPlayListsOfChannelQuery): Future[FindPlayListsOfChannelResponse] = {
+    repository.findPlayLists(ChannelId(query.channelId)).map { playListIds =>
+      FindPlayListsOfChannelResponse(query.channelId, playListIds.map(_.id))
+    }
+  }
+}

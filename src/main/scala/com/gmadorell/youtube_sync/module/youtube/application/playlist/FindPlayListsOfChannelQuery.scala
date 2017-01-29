@@ -1,3 +1,5 @@
 package com.gmadorell.youtube_sync.module.youtube.application.playlist
 
-case class FindPlayListsOfChannelQuery(channelId: String)
+import com.gmadorell.bus.model.Query
+
+case class FindPlayListsOfChannelQuery(channelId: String) extends Query

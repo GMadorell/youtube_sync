@@ -8,9 +8,9 @@ import com.gmadorell.youtube.video.VideoSearcher
 import monix.execution.Scheduler
 
 final class YoutubeApi(private val apiKey: String)(implicit scheduler: Scheduler) {
-  private val playListsRepository = new PlayListSearcher(apiKey)
-  private val videoRepository     = new VideoSearcher(apiKey)
+  private val playListSearcher = new PlayListSearcher(apiKey)
+  private val videoSearcher    = new VideoSearcher(apiKey)
 
-  def playLists(channelId: ChannelId): Future[Set[PlayList]] = playListsRepository.playLists(channelId)
-  def videos(playListId: PlayListId): Future[Set[Video]]     = videoRepository.videos(playListId)
+  def playLists(channelId: ChannelId): Future[Set[PlayList]] = playListSearcher.playLists(channelId)
+  def videos(playListId: PlayListId): Future[Set[Video]]     = videoSearcher.videos(playListId)
 }
