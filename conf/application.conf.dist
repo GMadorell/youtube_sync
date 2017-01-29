@@ -11,3 +11,11 @@ context {
 youtube-api {
   api-key = "YOUR_API_KEY"
 }
+
+test {
+  dummy-user {
+    channel-id = "Some dummy channel id used only for testing purposes"
+    playlists = ["The playlists of the above channel"]
+  }
+}
+

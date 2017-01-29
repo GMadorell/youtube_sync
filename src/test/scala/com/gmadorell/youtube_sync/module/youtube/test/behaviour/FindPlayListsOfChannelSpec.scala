@@ -5,7 +5,7 @@ import scala.concurrent.Future
 import com.gmadorell.youtube_sync.module.shared.stub.SetStub
 import com.gmadorell.youtube_sync.module.youtube.application.playlist.FindPlayListsOfChannelQueryHandler
 import com.gmadorell.youtube_sync.module.youtube.domain.PlayListRepository
-import com.gmadorell.youtube_sync.module.youtube.test.stub.{
+import com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub.{
   ChannelIdStub,
   FindPlayListsOfChannelQueryStub,
   FindPlayListsOfChannelResponseStub,
@@ -23,17 +23,17 @@ final class FindPlayListsOfChannelSpec extends WordSpec with MockFactory with Sc
     "find the playlists of a channel" in {
       val repository = mock[PlayListRepository]
 
-      val query           = FindPlayListsOfChannelQueryStub.random
-      val playListsOfUser = SetStub.random(PlayListIdStub.random)
+      val query              = FindPlayListsOfChannelQueryStub.random
+      val playListsOfChannel = SetStub.random(PlayListIdStub.random)
 
       val queryHandler = new FindPlayListsOfChannelQueryHandler(repository)
 
       (repository.findPlayLists _)
         .expects(ChannelIdStub.create(query.channelId))
         .once()
-        .returning(Future.successful(playListsOfUser))
+        .returning(Future.successful(playListsOfChannel))
 
-      val expectedResponse = FindPlayListsOfChannelResponseStub.create(query.channelId, playListsOfUser.map(_.id))
+      val expectedResponse = FindPlayListsOfChannelResponseStub.create(query.channelId, playListsOfChannel.map(_.id))
       queryHandler.handle(query).futureValue shouldBe expectedResponse
     }
   }

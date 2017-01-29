@@ -1,4 +1,4 @@
-package com.gmadorell.youtube_sync.module.youtube.test.stub
+package com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub
 
 import com.gmadorell.youtube_sync.module.shared.stub.SetStub
 import com.gmadorell.youtube_sync.module.youtube.application.playlist.FindPlayListsOfChannelResponse

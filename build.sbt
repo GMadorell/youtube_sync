@@ -1,8 +1,10 @@
+import sbt.Configuration
+
 name := """youtube_sync"""
 
 version := "1.0"
 
-scalaVersion := "2.11.8"
+Configuration.commonSettings
 
 resourceDirectory in Compile := baseDirectory.value / "conf"
 

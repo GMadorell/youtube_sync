@@ -6,3 +6,4 @@
 /target/
 
 conf/application.conf
+test.conf

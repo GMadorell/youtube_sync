@@ -1,4 +1,4 @@
-package com.gmadorell.youtube_sync.module.youtube.test.stub
+package com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub
 
 import com.gmadorell.youtube_sync.module.shared.stub.StringStub
 import com.gmadorell.youtube_sync.module.youtube.domain.model.ChannelId
