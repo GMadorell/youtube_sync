@@ -7,9 +7,12 @@ import net.codingwell.scalaguice.ScalaModule
 import net.codingwell.scalaguice.InjectorExtensions._
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
+import scala.concurrent.duration._
 
 abstract class YoutubeSyncIntegrationTest extends IntegrationTest {
   override def baseModule: ScalaModule = new YoutubeSyncGuiceModule
+
+  override implicit def patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
 
   def playListRepository(implicit injector: Injector): PlayListRepository = injector.instance[PlayListRepository]
 }

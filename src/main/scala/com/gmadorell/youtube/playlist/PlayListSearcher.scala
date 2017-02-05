@@ -2,13 +2,14 @@ package com.gmadorell.youtube.playlist
 
 import scala.concurrent.Future
 
-import fr.hmil.roshttp.{HttpRequest, Method, Protocol}
-import io.circe.Decoder
-import io.circe.parser.decode
-import io.circe.generic.semiauto._
 import PlaylistsResponseMarshaller._
 import com.gmadorell.youtube.model.{ChannelId, PlayList, PlayListId}
 import com.gmadorell.youtube.shared.YoutubeRequest
+import fr.hmil.roshttp.HttpRequest
+import fr.hmil.roshttp.exceptions.HttpException
+import io.circe.Decoder
+import io.circe.generic.semiauto._
+import io.circe.parser.decode
 import monix.execution.Scheduler
 
 final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
@@ -35,16 +36,24 @@ final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
     }
 
     def executePlayListsRequest(request: HttpRequest): Future[Set[PlayList]] = {
-      request.send().flatMap { response =>
-        decode[PlaylistsResponse](response.body) match {
-          case Right(playListsResponse) =>
-            val responsePlayLists = playListsResponse.items.map(responsePlayListItemToPlaylist).toSet
-            iterate(playListsResponse).map { paginatedPlayLists =>
-              responsePlayLists ++ paginatedPlayLists
-            }
-          case Left(error) => Future.failed(error)
+      request
+        .send()
+        .flatMap { response =>
+          decode[PlaylistsResponse](response.body) match {
+            case Right(playListsResponse) =>
+              val responsePlayLists = playListsResponse.items.map(responsePlayListItemToPlaylist).toSet
+              iterate(playListsResponse).map { paginatedPlayLists =>
+                responsePlayLists ++ paginatedPlayLists
+              }
+            case Left(error) => Future.failed(error)
+          }
         }
-      }
+        .recover {
+          case HttpException(response) =>
+            response.statusCode match {
+              case 404 => Set()
+            }
+        }
     }
 
     executePlayListsRequest(requestWithChannelId)
