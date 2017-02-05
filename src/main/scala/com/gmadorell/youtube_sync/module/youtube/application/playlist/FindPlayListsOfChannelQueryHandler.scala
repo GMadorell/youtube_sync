@@ -2,7 +2,7 @@ package com.gmadorell.youtube_sync.module.youtube.application.playlist
 
 import scala.concurrent.{ExecutionContext, Future}
 
-import com.gmadorell.bus.domain.QueryHandler
+import com.gmadorell.bus.domain.query.QueryHandler
 import com.gmadorell.youtube_sync.module.youtube.domain.PlayListRepository
 import com.gmadorell.youtube_sync.module.youtube.domain.model.ChannelId
 
