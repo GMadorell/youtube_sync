@@ -2,8 +2,10 @@ package com.gmadorell.bus.domain.command
 
 import scala.concurrent.Future
 
-import com.gmadorell.bus.model.command.Command
+import com.gmadorell.bus.model.command.{Command, CommandName}
 
-trait CommandHandler[CommandT <: Command] {
-  def handle(command: CommandT): Future[Unit]
+trait CommandHandler {
+  val name: CommandName
+
+  def handle(command: Command): Future[Unit]
 }

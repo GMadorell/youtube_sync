@@ -1,5 +1,3 @@
-import sbt.Configuration
-
 name := """youtube_sync"""
 
 version := "1.0"

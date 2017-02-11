@@ -1,5 +1,3 @@
 package com.gmadorell.bus.model.query
 
-trait Query {
-  val name: QueryName
-}
+case class QueryName(name: String)
