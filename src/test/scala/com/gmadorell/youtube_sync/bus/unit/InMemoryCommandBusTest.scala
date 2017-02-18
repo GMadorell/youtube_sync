@@ -3,12 +3,14 @@ package com.gmadorell.youtube_sync.bus.unit
 import scala.concurrent.Future
 
 import com.gmadorell.bus.domain.command.CommandHandler
+import com.gmadorell.bus.domain.command.error.{AddHandlerError, HandleError, HandlerAlreadyExists, HandlerNotFound}
 import com.gmadorell.bus.infrastructure.command.InMemoryCommandBus
 import com.gmadorell.bus.model.command.{Command, CommandName}
+import com.gmadorell.youtube_sync.util.matcher.EitherMatchers
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
 
-final class InMemoryCommandBusTest extends WordSpec with Matchers with ScalaFutures {
+final class InMemoryCommandBusTest extends WordSpec with Matchers with ScalaFutures with EitherMatchers {
   "An InMemoryCommandBus" should {
     "handle a command" in {
       val commandBus = new InMemoryCommandBus
@@ -16,15 +18,23 @@ final class InMemoryCommandBusTest extends WordSpec with Matchers with ScalaFutu
 
       commandBus.addHandler(handler)
 
-      val handleResult = commandBus.handle(SimpleCommandStub())
-      handleResult.isRight shouldBe true
-      handleResult.right.get.futureValue shouldBe (())
+      commandBus.handle(SimpleCommandStub()) shouldBe successfulFuture
       handler.amountOfProcessedCommands shouldBe 1
     }
 
-    "fail when adding two handlers for the same command name" in {}
+    "fail when adding two handlers for the same command name" in {
+      val commandBus = new InMemoryCommandBus
+      val handler    = new SimpleCountCommandHandlerStub
 
-    "fail when a handler for a certain command doesn't exist" in {}
+      commandBus.addHandler(handler) shouldBe right
+      commandBus.addHandler(handler) should beLeft[AddHandlerError](HandlerAlreadyExists(handler.name))
+    }
+
+    "fail when a handler for a certain command doesn't exist" in {
+      val commandBus = new InMemoryCommandBus
+
+      commandBus.handle(SimpleCommandStub()) should beLeft[HandleError](HandlerNotFound(StubCommandNames.simple))
+    }
   }
 }
 
