@@ -1,3 +1,5 @@
 package com.gmadorell.bus.model.query
 
-trait Response {}
+trait Response {
+  val name: QueryName
+}

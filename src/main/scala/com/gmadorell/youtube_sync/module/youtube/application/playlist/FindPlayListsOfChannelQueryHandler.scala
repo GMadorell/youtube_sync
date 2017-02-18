@@ -8,7 +8,7 @@ import com.gmadorell.youtube_sync.module.youtube.domain.PlayListRepository
 import com.gmadorell.youtube_sync.module.youtube.domain.model.ChannelId
 
 final class FindPlayListsOfChannelQueryHandler(repository: PlayListRepository)(implicit ec: ExecutionContext)
-    extends QueryHandler[FindPlayListsOfChannelResponse] {
+    extends QueryHandler {
 
   override val name: QueryName = FindPlayListsOfChannelQuery.name
 

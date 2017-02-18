@@ -3,7 +3,7 @@ package com.gmadorell.youtube_sync.bus.unit
 import scala.concurrent.Future
 
 import com.gmadorell.bus.domain.command.CommandHandler
-import com.gmadorell.bus.domain.command.error.{AddHandlerError, HandleError, HandlerAlreadyExists, HandlerNotFound}
+import com.gmadorell.bus.domain.command.error.{AddCommandHandlerError, CommandHandleError, CommandHandlerAlreadyExists, CommandHandlerNotFound}
 import com.gmadorell.bus.infrastructure.command.InMemoryCommandBus
 import com.gmadorell.bus.model.command.{Command, CommandName}
 import com.gmadorell.youtube_sync.util.matcher.EitherMatchers
@@ -27,13 +27,13 @@ final class InMemoryCommandBusTest extends WordSpec with Matchers with ScalaFutu
       val handler    = new SimpleCountCommandHandlerStub
 
       commandBus.addHandler(handler) shouldBe right
-      commandBus.addHandler(handler) should beLeft[AddHandlerError](HandlerAlreadyExists(handler.name))
+      commandBus.addHandler(handler) should beLeft[AddCommandHandlerError](CommandHandlerAlreadyExists(handler.name))
     }
 
     "fail when a handler for a certain command doesn't exist" in {
       val commandBus = new InMemoryCommandBus
 
-      commandBus.handle(SimpleCommandStub()) should beLeft[HandleError](HandlerNotFound(StubCommandNames.simple))
+      commandBus.handle(SimpleCommandStub()) should beLeft[CommandHandleError](CommandHandlerNotFound(StubCommandNames.simple))
     }
   }
 }
