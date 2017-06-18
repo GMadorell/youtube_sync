@@ -16,7 +16,7 @@ final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
   private val requestSkeleton = YoutubeRequest.baseRequest
     .withPath("playlists")
     .withQueryParameters(
-      "part"       -> "id,status",
+      "part"       -> "id,status,snippet",
       "key"        -> apiKey,
       "maxResults" -> "20"
     )
@@ -61,8 +61,13 @@ final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
 }
 
 private object PlaylistsResponseMarshaller {
+  case class ResponsePlayListSnippet(title: String)
   case class ResponsePlaylistStatus(privacyStatus: String)
-  case class ResponsePlaylistItem(kind: String, etag: String, id: String, status: ResponsePlaylistStatus)
+  case class ResponsePlaylistItem(kind: String,
+                                  etag: String,
+                                  id: String,
+                                  status: ResponsePlaylistStatus,
+                                  snippet: ResponsePlayListSnippet)
   case class ResponsePageInfo(totalResults: Int, resultsPerPage: Int)
   case class PlaylistsResponse(kind: String,
                                etag: String,
@@ -70,8 +75,9 @@ private object PlaylistsResponseMarshaller {
                                nextPageToken: Option[String],
                                items: Seq[ResponsePlaylistItem])
 
-  implicit val reponsePlaylistStatusDecoder: Decoder[ResponsePlaylistStatus] = deriveDecoder
-  implicit val reponsePlaylistItemDecoder: Decoder[ResponsePlaylistItem]     = deriveDecoder
-  implicit val responsePageInfoDecoder: Decoder[ResponsePageInfo]            = deriveDecoder
-  implicit val playlistsResponseDecoder: Decoder[PlaylistsResponse]          = deriveDecoder
+  implicit val responsePlayListSnippetDecoder: Decoder[ResponsePlayListSnippet] = deriveDecoder
+  implicit val responsePlaylistStatusDecoder: Decoder[ResponsePlaylistStatus]   = deriveDecoder
+  implicit val responsePlaylistItemDecoder: Decoder[ResponsePlaylistItem]       = deriveDecoder
+  implicit val responsePageInfoDecoder: Decoder[ResponsePageInfo]               = deriveDecoder
+  implicit val playlistsResponseDecoder: Decoder[PlaylistsResponse]             = deriveDecoder
 }

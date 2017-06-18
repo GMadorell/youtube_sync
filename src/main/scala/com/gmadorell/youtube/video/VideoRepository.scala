@@ -16,7 +16,7 @@ final class VideoSearcher(apiKey: String)(implicit scheduler: Scheduler) {
   private val requestSkeleton = YoutubeRequest.baseRequest
     .withPath("playlistItems")
     .withQueryParameters(
-      "part"       -> "contentDetails",
+      "part"       -> "contentDetails,snippet",
       "key"        -> apiKey,
       "maxResults" -> "50"
     )
@@ -68,9 +68,11 @@ private object PlaylistItemsResponseMarshaller {
                                    prevPageToken: Option[String],
                                    items: Seq[Item])
   case class PageInfo(totalResults: Int, resultsPerPage: Int)
-  case class Item(kind: String, etag: String, id: String, contentDetails: ItemContentDetails)
+  case class Item(kind: String, etag: String, id: String, contentDetails: ItemContentDetails, snippet: ItemSnippet)
   case class ItemContentDetails(videoId: String, videoPublishedAt: Option[String])
+  case class ItemSnippet(title: String)
 
+  implicit val itemSnippetDecoder: Decoder[ItemSnippet]                 = deriveDecoder
   implicit val itemContentDetailsDecoder: Decoder[ItemContentDetails]   = deriveDecoder
   implicit val responsePlaylistItemDecoder: Decoder[Item]               = deriveDecoder
   implicit val responsePageInfoDecoder: Decoder[PageInfo]               = deriveDecoder
