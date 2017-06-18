@@ -26,5 +26,16 @@ final class SynchronizeVideoOnVideoFetchedSpec extends YoutubeBehaviourSpec {
 
       handler.handle(videoFetched).futureValue
     }
+
+    "not create a video pertaining to a playlist if it already exists" in {
+      val videoFetched = VideoFetchedStub.random
+
+      val playListId = PlayListIdStub.create(videoFetched.playListId)
+      val videoId    = VideoIdStub.create(videoFetched.videoId)
+
+      playListVideoShouldExist(playListId, videoId)
+
+      handler.handle(videoFetched).futureValue
+    }
   }
 }

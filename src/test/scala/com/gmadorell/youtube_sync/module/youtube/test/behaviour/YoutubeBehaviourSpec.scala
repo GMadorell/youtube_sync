@@ -4,8 +4,7 @@ import scala.concurrent.Future
 
 import com.gmadorell.bus.domain.event.EventBus
 import com.gmadorell.bus.model.event.Event
-import com.gmadorell.youtube_sync.module.youtube.application.sync.PlayListVideoRepository
-import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, VideoRepository}
+import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, PlayListVideoRepository, VideoRepository}
 import com.gmadorell.youtube_sync.module.youtube.domain.model.{ChannelId, PlayListId, VideoId}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, OneInstancePerTest, WordSpec}

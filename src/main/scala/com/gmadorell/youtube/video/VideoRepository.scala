@@ -6,6 +6,7 @@ import PlaylistItemsResponseMarshaller._
 import com.gmadorell.youtube.model.{PlayListId, Video, VideoId}
 import com.gmadorell.youtube.shared.YoutubeRequest
 import fr.hmil.roshttp.HttpRequest
+import fr.hmil.roshttp.exceptions.HttpException
 import io.circe.Decoder
 import io.circe.parser.decode
 import monix.execution.Scheduler
@@ -35,16 +36,24 @@ final class VideoSearcher(apiKey: String)(implicit scheduler: Scheduler) {
     }
 
     def executePlayListItemsRequest(request: HttpRequest): Future[Set[Video]] = {
-      request.send().flatMap { response =>
-        decode[PlaylistItemsResponse](response.body) match {
-          case Right(playListItemsResponse) =>
-            val responsePlayListItems = playListItemsResponse.items.map(responsePlayListItemToVideo).toSet
-            iterate(playListItemsResponse).map { paginatedPlayListItems =>
-              responsePlayListItems ++ paginatedPlayListItems
-            }
-          case Left(error) => Future.failed(error)
+      request
+        .send()
+        .flatMap { response =>
+          decode[PlaylistItemsResponse](response.body) match {
+            case Right(playListItemsResponse) =>
+              val responsePlayListItems = playListItemsResponse.items.map(responsePlayListItemToVideo).toSet
+              iterate(playListItemsResponse).map { paginatedPlayListItems =>
+                responsePlayListItems ++ paginatedPlayListItems
+              }
+            case Left(error) => Future.failed(error)
+          }
         }
-      }
+        .recover {
+          case HttpException(response) =>
+            response.statusCode match {
+              case 404 => Set()
+            }
+        }
     }
 
     executePlayListItemsRequest(requestWithPlayListId)

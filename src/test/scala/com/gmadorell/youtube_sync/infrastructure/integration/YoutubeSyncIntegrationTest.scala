@@ -1,7 +1,7 @@
 package com.gmadorell.youtube_sync.infrastructure.integration
 
 import com.gmadorell.youtube_sync.infrastructure.dependency_injection.YoutubeSyncGuiceModule
-import com.gmadorell.youtube_sync.module.youtube.domain.PlayListRepository
+import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, VideoRepository}
 import com.google.inject.{Guice, Injector}
 import net.codingwell.scalaguice.ScalaModule
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -15,6 +15,7 @@ abstract class YoutubeSyncIntegrationTest extends IntegrationTest {
   override implicit def patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
 
   def playListRepository(implicit injector: Injector): PlayListRepository = injector.instance[PlayListRepository]
+  def videoRepository(implicit injector: Injector): VideoRepository       = injector.instance[VideoRepository]
 }
 
 abstract class IntegrationTest extends WordSpec with ScalaFutures with Matchers {

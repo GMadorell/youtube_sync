@@ -2,6 +2,7 @@ package com.gmadorell.youtube_sync.module.youtube.application.sync
 
 import scala.concurrent.{ExecutionContext, Future}
 
+import com.gmadorell.youtube_sync.module.youtube.domain.PlayListVideoRepository
 import com.gmadorell.youtube_sync.module.youtube.domain.model.{PlayListId, VideoId}
 
 final class VideoSynchronizer(playListVideoRepository: PlayListVideoRepository)(implicit ec: ExecutionContext) {
@@ -14,10 +15,4 @@ final class VideoSynchronizer(playListVideoRepository: PlayListVideoRepository)(
       }
     }
   }
-}
-
-trait PlayListVideoRepository {
-  def exists(playListId: PlayListId, videoId: VideoId): Future[Boolean]
-
-  def create(playListId: PlayListId, videoId: VideoId): Future[Unit]
 }
