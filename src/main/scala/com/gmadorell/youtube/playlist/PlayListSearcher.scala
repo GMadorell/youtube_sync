@@ -3,7 +3,7 @@ package com.gmadorell.youtube.playlist
 import scala.concurrent.Future
 
 import PlaylistsResponseMarshaller._
-import com.gmadorell.youtube.model.{ChannelId, PlayList, PlayListId}
+import com.gmadorell.youtube.model.{ChannelId, PlayList, PlayListId, PlayListName}
 import com.gmadorell.youtube.shared.YoutubeRequest
 import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.exceptions.HttpException
@@ -25,7 +25,7 @@ final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
     val requestWithChannelId = requestSkeleton.withQueryParameter("channelId", channelId.id)
 
     def responsePlayListItemToPlaylist(responsePlaylistItem: ResponsePlaylistItem): PlayList =
-      PlayList(PlayListId(responsePlaylistItem.id))
+      PlayList(id = PlayListId(responsePlaylistItem.id), name = PlayListName(responsePlaylistItem.snippet.title))
 
     def iterate(previousResponse: PlaylistsResponse): Future[Set[PlayList]] = {
       previousResponse.nextPageToken match {

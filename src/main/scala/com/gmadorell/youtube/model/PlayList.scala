@@ -1,5 +1,7 @@
 package com.gmadorell.youtube.model
 
-case class PlayList(id: PlayListId)
+final case class PlayList(id: PlayListId, name: PlayListName)
 
-case class PlayListId(id: String)
+final case class PlayListId(id: String)
+
+final case class PlayListName(name: String)

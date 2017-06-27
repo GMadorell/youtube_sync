@@ -6,5 +6,5 @@ import com.gmadorell.youtube_sync.module.youtube.domain.model.VideoId
 object VideoIdStub {
   def create(videoId: String = StringStub.random(10)): VideoId = VideoId(videoId)
 
-  def random: VideoId = create()
+  def random(): VideoId = create()
 }

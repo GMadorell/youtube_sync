@@ -9,9 +9,9 @@ import com.gmadorell.youtube_sync.module.youtube.domain.model.ChannelId
 final class FetchPlayListsOfChannelCommandHandler(repository: PlayListRepository, eventBus: EventBus)(
     implicit ec: ExecutionContext) {
   def handle(command: FetchPlayListsOfChannelCommand): Future[Unit] = {
-    repository.findPlayLists(ChannelId(command.channelId)).map { playListIds =>
-      playListIds.map { playListId =>
-        eventBus.handle(PlayListFetched(command.channelId, playListId.id))
+    repository.findPlayLists(ChannelId(command.channelId)).map { playLists =>
+      playLists.map { playList =>
+        eventBus.handle(PlayListFetched(command.channelId, playList.id.id, playList.name.name))
       }
     }
   }

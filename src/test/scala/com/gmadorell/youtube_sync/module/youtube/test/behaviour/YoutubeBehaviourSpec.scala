@@ -5,7 +5,7 @@ import scala.concurrent.Future
 import com.gmadorell.bus.domain.event.EventBus
 import com.gmadorell.bus.model.event.Event
 import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, PlayListVideoRepository, VideoRepository}
-import com.gmadorell.youtube_sync.module.youtube.domain.model.{ChannelId, PlayListId, VideoId}
+import com.gmadorell.youtube_sync.module.youtube.domain.model.{ChannelId, PlayList, PlayListId, VideoId}
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, OneInstancePerTest, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
@@ -16,7 +16,7 @@ trait YoutubeBehaviourSpec extends WordSpec with MockFactory with ScalaFutures w
   val playListVideoRepository: PlayListVideoRepository = mock[PlayListVideoRepository]
   val eventBus: EventBus                               = mock[EventBus]
 
-  def shouldFindPlayListsOfChannel(channelId: ChannelId, playListsOfChannel: Set[PlayListId]): Unit = {
+  def shouldFindPlayListsOfChannel(channelId: ChannelId, playListsOfChannel: Set[PlayList]): Unit = {
     (playListRepository.findPlayLists _)
       .expects(channelId)
       .once()
