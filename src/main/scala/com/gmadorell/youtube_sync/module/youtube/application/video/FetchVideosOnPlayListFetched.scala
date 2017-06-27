@@ -12,7 +12,7 @@ final class FetchVideosOnPlayListFetched(repository: VideoRepository, eventBus: 
   def handle(event: PlayListFetched): Future[Unit] = {
     repository.findVideos(PlayListId(event.playListId)).map { videoIds =>
       videoIds.map { videoId =>
-        eventBus.handle(VideoFetched(event.channelId, event.playListId, videoId.id))
+        eventBus.handle(VideoFetched(event.channelId, event.playListId, event.playListName, videoId.id))
       }
     }
   }

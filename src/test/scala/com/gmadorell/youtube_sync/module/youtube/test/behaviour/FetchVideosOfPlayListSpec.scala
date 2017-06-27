@@ -10,15 +10,19 @@ final class FetchVideosOfPlayListSpec extends YoutubeBehaviourSpec {
 
   "A FetchVideosOnPlayListFetched" should {
     "find the videos of a playlist" in {
-      val event            = PlayListFetchedStub.random
-      val videosOfPlayList = SetStub.random(VideoIdStub.random)
+      val event            = PlayListFetchedStub.random()
+      val videosOfPlayList = SetStub.random(() => VideoIdStub.random())
 
       val eventHandler = new FetchVideosOnPlayListFetched(videoRepository, eventBus)
 
       shouldFindVideosOfPlayList(PlayListIdStub.create(event.playListId), videosOfPlayList)
 
-      videosOfPlayList.foreach { playListId =>
-        shouldPublishEvent(VideoFetchedStub.create(event.channelId, event.playListId, playListId.id))
+      videosOfPlayList.foreach { videoId =>
+        shouldPublishEvent(
+          VideoFetchedStub.create(channelId = event.channelId,
+                                  playListId = event.playListId,
+                                  playListName = event.playListName,
+                                  videoId = videoId.id))
       }
 
       eventHandler.handle(event).futureValue
