@@ -3,7 +3,7 @@ package com.gmadorell.youtube.video
 import scala.concurrent.Future
 
 import PlaylistItemsResponseMarshaller._
-import com.gmadorell.youtube.model.{PlayListId, Video, VideoId}
+import com.gmadorell.youtube.model.{PlayListId, Video, VideoId, VideoName}
 import com.gmadorell.youtube.shared.YoutubeRequest
 import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.exceptions.HttpException
@@ -24,8 +24,8 @@ final class VideoSearcher(apiKey: String)(implicit scheduler: Scheduler) {
   def videos(playListId: PlayListId): Future[Set[Video]] = {
     val requestWithPlayListId = requestSkeleton.withQueryParameter("playlistId", playListId.id)
 
-    def responsePlayListItemToVideo(responsePlaylistItemsItem: Item): Video =
-      Video(VideoId(responsePlaylistItemsItem.contentDetails.videoId))
+    def responsePlayListItemToVideo(item: Item): Video =
+      Video(VideoId(item.contentDetails.videoId), VideoName(item.snippet.title))
 
     def iterate(previousResponse: PlaylistItemsResponse): Future[Set[Video]] = {
       previousResponse.nextPageToken match {

@@ -1,5 +1,7 @@
 package com.gmadorell.youtube.model
 
-case class Video(videoId: VideoId)
+final case class Video(videoId: VideoId, name: VideoName)
 
-case class VideoId(id: String)
+final case class VideoId(id: String)
+
+final case class VideoName(name: String)

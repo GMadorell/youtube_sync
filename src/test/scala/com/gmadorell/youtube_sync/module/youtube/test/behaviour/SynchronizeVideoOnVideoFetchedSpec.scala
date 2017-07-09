@@ -4,11 +4,7 @@ import com.gmadorell.youtube_sync.module.youtube.application.sync.{
   SynchronizeVideoOnVideoFetchedEventHandler,
   VideoSynchronizer
 }
-import com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub.{
-  PlayListIdStub,
-  VideoFetchedStub,
-  VideoIdStub
-}
+import com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub._
 
 final class SynchronizeVideoOnVideoFetchedSpec extends YoutubeBehaviourSpec {
   private implicit val ec = scala.concurrent.ExecutionContext.global
@@ -16,24 +12,28 @@ final class SynchronizeVideoOnVideoFetchedSpec extends YoutubeBehaviourSpec {
 
   "SynchronizeVideoOnVideoFetchedEventHandler" should {
     "create a video pertaining to a playlist if it didn't already exist" in {
-      val videoFetched = VideoFetchedStub.random
+      val videoFetched = VideoFetchedStub.random()
 
-      val playListId = PlayListIdStub.create(videoFetched.playListId)
-      val videoId    = VideoIdStub.create(videoFetched.videoId)
+      val playList = PlayListStub.create(id = PlayListIdStub.create(videoFetched.playListId),
+                                         name = PlayListNameStub.create(videoFetched.playListName))
+      val video = VideoStub.create(id = VideoIdStub.create(videoFetched.videoId),
+                                   name = VideoNameStub.create(videoFetched.videoName))
 
-      playListVideoShouldNotExist(playListId, videoId)
-      shouldCreatePlayListVideo(playListId, videoId)
+      playListVideoShouldNotExist(playList, video)
+      shouldCreatePlayListVideo(playList, video)
 
       handler.handle(videoFetched).futureValue
     }
 
     "not create a video pertaining to a playlist if it already exists" in {
-      val videoFetched = VideoFetchedStub.random
+      val videoFetched = VideoFetchedStub.random()
 
-      val playListId = PlayListIdStub.create(videoFetched.playListId)
-      val videoId    = VideoIdStub.create(videoFetched.videoId)
+      val playList = PlayListStub.create(id = PlayListIdStub.create(videoFetched.playListId),
+                                         name = PlayListNameStub.create(videoFetched.playListName))
+      val video = VideoStub.create(id = VideoIdStub.create(videoFetched.videoId),
+                                   name = VideoNameStub.create(videoFetched.videoName))
 
-      playListVideoShouldExist(playListId, videoId)
+      playListVideoShouldExist(playList, video)
 
       handler.handle(videoFetched).futureValue
     }

@@ -5,7 +5,7 @@ import scala.concurrent.Future
 import com.gmadorell.bus.domain.event.EventBus
 import com.gmadorell.bus.model.event.Event
 import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, PlayListVideoRepository, VideoRepository}
-import com.gmadorell.youtube_sync.module.youtube.domain.model.{ChannelId, PlayList, PlayListId, VideoId}
+import com.gmadorell.youtube_sync.module.youtube.domain.model._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, OneInstancePerTest, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
@@ -23,7 +23,7 @@ trait YoutubeBehaviourSpec extends WordSpec with MockFactory with ScalaFutures w
       .returning(Future.successful(playListsOfChannel))
   }
 
-  def shouldFindVideosOfPlayList(playListId: PlayListId, videos: Set[VideoId]): Unit = {
+  def shouldFindVideosOfPlayList(playListId: PlayListId, videos: Set[Video]): Unit = {
     (videoRepository.findVideos _)
       .expects(playListId)
       .once()
@@ -37,21 +37,21 @@ trait YoutubeBehaviourSpec extends WordSpec with MockFactory with ScalaFutures w
       .returning(Right(Future.successful(())))
   }
 
-  def playListVideoShouldExist(playListId: PlayListId, videoId: VideoId): Unit =
+  def playListVideoShouldExist(playList: PlayList, video: Video): Unit =
     (playListVideoRepository.exists _)
-      .expects(playListId, videoId)
+      .expects(playList, video)
       .once()
       .returning(Future.successful(true))
 
-  def playListVideoShouldNotExist(playListId: PlayListId, videoId: VideoId): Unit =
+  def playListVideoShouldNotExist(playList: PlayList, video: Video): Unit =
     (playListVideoRepository.exists _)
-      .expects(playListId, videoId)
+      .expects(playList, video)
       .once()
       .returning(Future.successful(false))
 
-  def shouldCreatePlayListVideo(playListId: PlayListId, videoId: VideoId): Unit =
+  def shouldCreatePlayListVideo(playList: PlayList, video: Video): Unit =
     (playListVideoRepository.create _)
-      .expects(playListId, videoId)
+      .expects(playList, video)
       .once()
       .returning(Future.successful(()))
 }

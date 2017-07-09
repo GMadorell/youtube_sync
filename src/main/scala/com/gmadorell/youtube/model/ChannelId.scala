@@ -1,3 +1,3 @@
 package com.gmadorell.youtube.model
 
-case class ChannelId(id: String)
+final case class ChannelId(id: String)

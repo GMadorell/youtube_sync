@@ -3,7 +3,7 @@ package com.gmadorell.youtube_sync.module.youtube.infrastructure.dependency_inje
 import scala.concurrent.ExecutionContext
 
 import com.gmadorell.youtube.YoutubeApi
-import com.gmadorell.youtube_sync.infrastructure.configuration.Configuration
+import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
 import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, VideoRepository}
 import com.gmadorell.youtube_sync.module.youtube.infrastructure.{ApiPlayListRepository, ApiVideoRepository}
 import net.codingwell.scalaguice.ScalaModule
@@ -17,7 +17,7 @@ final class YoutubeGuiceModule extends ScalaModule {
   }
 }
 
-private class YoutubeApiProvider @Inject()(configuration: Configuration)(implicit ec: ExecutionContext)
+private class YoutubeApiProvider @Inject()(configuration: YoutubeSyncConfiguration)(implicit ec: ExecutionContext)
     extends Provider[YoutubeApi] {
   override def get(): YoutubeApi = new YoutubeApi(configuration.apiKey)
 }

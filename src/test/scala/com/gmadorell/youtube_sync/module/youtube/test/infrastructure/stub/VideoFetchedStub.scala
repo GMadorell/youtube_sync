@@ -6,8 +6,9 @@ object VideoFetchedStub {
   def create(channelId: String = ChannelIdStub.random().id,
              playListId: String = PlayListIdStub.random().id,
              playListName: String = PlayListNameStub.random().name,
-             videoId: String = VideoIdStub.random().id): VideoFetched = {
-    VideoFetched(channelId, playListId, playListName, videoId)
+             videoId: String = VideoIdStub.random().id,
+             videoName: String = VideoNameStub.random().name): VideoFetched = {
+    VideoFetched(channelId, playListId, playListName, videoId, videoName)
   }
 
   def random(): VideoFetched = create()

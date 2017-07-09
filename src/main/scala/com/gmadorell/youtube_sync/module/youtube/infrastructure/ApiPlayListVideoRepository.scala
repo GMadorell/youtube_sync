@@ -4,18 +4,12 @@ import scala.concurrent.Future
 
 import com.gmadorell.youtube.YoutubeApi
 import com.gmadorell.youtube_sync.module.youtube.domain.PlayListVideoRepository
-import com.gmadorell.youtube_sync.module.youtube.domain.model.{PlayListId, VideoId}
+import com.gmadorell.youtube_sync.module.youtube.domain.model.{PlayList, Video}
 
 final class ApiPlayListVideoRepository(youtubeApi: YoutubeApi) extends PlayListVideoRepository {
-
-  /*
-   TODO The name should already be given as parameter here! Rework the api so that we get the name
-   on the first request we do, and then pass video objects around instead of simply the id
-   */
-
-  override def exists(playListId: PlayListId, videoId: VideoId): Future[Boolean] =
+  override def exists(playListId: PlayList, videoId: Video): Future[Boolean] =
     Future.successful(false) // TODO
 
-  override def create(playListId: PlayListId, videoId: VideoId): Future[Unit] =
+  override def create(playListId: PlayList, videoId: Video): Future[Unit] =
     Future.successful(()) // TODO
 }
