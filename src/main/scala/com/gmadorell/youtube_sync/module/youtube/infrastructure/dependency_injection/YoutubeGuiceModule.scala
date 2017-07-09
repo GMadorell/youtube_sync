@@ -2,24 +2,48 @@ package com.gmadorell.youtube_sync.module.youtube.infrastructure.dependency_inje
 
 import scala.concurrent.ExecutionContext
 
+import com.gmadorell.bus.domain.event.EventBus
+import com.gmadorell.bus.infrastructure.event.SimpleEventBus
 import com.gmadorell.youtube.YoutubeApi
 import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
-import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, VideoRepository}
-import com.gmadorell.youtube_sync.module.youtube.infrastructure.{ApiPlayListRepository, ApiVideoRepository}
+import com.gmadorell.youtube_sync.module.youtube.application.sync.{
+  SynchronizeVideoOnVideoFetchedEventHandler,
+  VideoSynchronizer
+}
+import com.gmadorell.youtube_sync.module.youtube.application.video.FetchVideosOnPlayListFetched
+import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, PlayListVideoRepository, VideoRepository}
+import com.gmadorell.youtube_sync.module.youtube.infrastructure.{
+  ApiPlayListRepository,
+  ApiVideoRepository,
+  FilesystemPlayListVideoRepository
+}
 import net.codingwell.scalaguice.ScalaModule
 import com.google.inject.{Inject, Provider, Singleton}
 
 final class YoutubeGuiceModule extends ScalaModule {
   override def configure(): Unit = {
-    bind[YoutubeApi].toProvider[YoutubeApiProvider].in[Singleton]
+    bind[EventBus].toProvider[SimpleEventBusProvider].in[Singleton]
     bind[PlayListRepository].toProvider[ApiPlayListRepositoryProvider].in[Singleton]
     bind[VideoRepository].toProvider[ApiVideoRepositoryProvider].in[Singleton]
+    bind[PlayListVideoRepository].toProvider[FilesystemPlayListVideoRepositoryProvider].in[Singleton]
+    bind[YoutubeApi].toProvider[YoutubeApiProvider].in[Singleton]
   }
 }
 
-private class YoutubeApiProvider @Inject()(configuration: YoutubeSyncConfiguration)(implicit ec: ExecutionContext)
-    extends Provider[YoutubeApi] {
-  override def get(): YoutubeApi = new YoutubeApi(configuration.apiKey)
+private class SimpleEventBusProvider @Inject()(
+    videoRepository: VideoRepository,
+    playListVideoRepository: PlayListVideoRepository)(implicit ec: ExecutionContext)
+    extends Provider[EventBus] {
+  override def get(): EventBus = {
+    val eventBus = new SimpleEventBus()
+
+    val fetchVideosOnPlayListFetched = new FetchVideosOnPlayListFetched(videoRepository, eventBus)
+    val synchronizeVideoOnVideoFetchedEventHandler = new SynchronizeVideoOnVideoFetchedEventHandler(
+      new VideoSynchronizer(playListVideoRepository))
+
+    eventBus.registerHandlers(fetchVideosOnPlayListFetched, synchronizeVideoOnVideoFetchedEventHandler)
+    eventBus
+  }
 }
 
 private class ApiPlayListRepositoryProvider @Inject()(youtubeApi: YoutubeApi)(implicit ec: ExecutionContext)
@@ -30,4 +54,14 @@ private class ApiPlayListRepositoryProvider @Inject()(youtubeApi: YoutubeApi)(im
 private class ApiVideoRepositoryProvider @Inject()(youtubeApi: YoutubeApi)(implicit ec: ExecutionContext)
     extends Provider[VideoRepository] {
   override def get(): VideoRepository = new ApiVideoRepository(youtubeApi)
+}
+
+private class FilesystemPlayListVideoRepositoryProvider @Inject()(configuration: YoutubeSyncConfiguration)
+    extends Provider[PlayListVideoRepository] {
+  override def get(): PlayListVideoRepository = new FilesystemPlayListVideoRepository()
+}
+
+private class YoutubeApiProvider @Inject()(configuration: YoutubeSyncConfiguration)(implicit ec: ExecutionContext)
+    extends Provider[YoutubeApi] {
+  override def get(): YoutubeApi = new YoutubeApi(configuration.apiKey)
 }

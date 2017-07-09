@@ -9,12 +9,27 @@ import com.gmadorell.youtube_sync.module.youtube.application.playlist.PlayListFe
 import com.gmadorell.youtube_sync.module.youtube.application.sync.SynchronizeVideoOnVideoFetchedEventHandler
 import com.gmadorell.youtube_sync.module.youtube.application.video.{FetchVideosOnPlayListFetched, VideoFetched}
 
-final class SimpleEventBus(fetchVideosOnPlayListFetched: FetchVideosOnPlayListFetched,
-                         synchronizeVideoOnVideoFetched: SynchronizeVideoOnVideoFetchedEventHandler)
-    extends EventBus {
+final class SimpleEventBus extends EventBus {
+
+  private var fetchVideosOnPlayListFetched: Option[FetchVideosOnPlayListFetched]                             = None
+  private var synchronizeVideoOnVideoFetchedEventHandler: Option[SynchronizeVideoOnVideoFetchedEventHandler] = None
+
   def handle(event: Event): Either[EventHandleError, Future[Unit]] = event match {
-    case playListFetched: PlayListFetched => Right(fetchVideosOnPlayListFetched.handle(playListFetched))
-    case videoFetched: VideoFetched       => Right(synchronizeVideoOnVideoFetched.handle(videoFetched))
-    case _                                => Left(EventHandlerNotFound(event))
+    case playListFetched: PlayListFetched =>
+      fetchVideosOnPlayListFetched.fold[Either[EventHandleError, Future[Unit]]](Left(UnregisteredHandlers))(handler =>
+        Right(handler.handle(playListFetched)))
+    case videoFetched: VideoFetched =>
+      synchronizeVideoOnVideoFetchedEventHandler.fold[Either[EventHandleError, Future[Unit]]](
+        Left(UnregisteredHandlers))(handler => Right(handler.handle(videoFetched)))
+    case _ => Left(EventHandlerNotFound(event))
+  }
+
+  def registerHandlers(
+      fetchVideosOnPlayListFetched: FetchVideosOnPlayListFetched,
+      synchronizeVideoOnVideoFetchedEventHandler: SynchronizeVideoOnVideoFetchedEventHandler): Unit = {
+    this.fetchVideosOnPlayListFetched = Some(fetchVideosOnPlayListFetched)
+    this.synchronizeVideoOnVideoFetchedEventHandler = Some(synchronizeVideoOnVideoFetchedEventHandler)
   }
 }
+
+case object UnregisteredHandlers extends EventHandleError

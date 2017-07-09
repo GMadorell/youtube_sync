@@ -14,8 +14,29 @@ youtube-api {
 
 test {
   dummy-user {
-    channel-id = "Some dummy channel id used only for testing purposes"
-    playlists = ["The playlists of the above channel"]
+    channel-id = "FILL_ME_UP"
+    playlists = [
+      {
+        id = "FILL_ME_UP",
+        name = "FILL_ME_UP",
+        videos = [
+          {
+            id = "FILL_ME_UP"
+            name = "FILL_ME_UP"
+          }
+        ]
+      },
+      {
+        id = "FILL_ME_UP",
+        name = "FILL_ME_UP",
+        videos = [
+          {
+            id = "FILL_ME_UP"
+            name = "FILL_ME_UP"
+          }
+        ]
+      }
+    ],
   }
 }
 
