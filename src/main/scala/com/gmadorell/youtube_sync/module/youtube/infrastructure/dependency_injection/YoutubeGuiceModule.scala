@@ -11,14 +11,20 @@ import com.gmadorell.youtube_sync.module.youtube.application.sync.{
   VideoSynchronizer
 }
 import com.gmadorell.youtube_sync.module.youtube.application.video.FetchVideosOnPlayListFetched
-import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, PlayListVideoRepository, VideoRepository}
+import com.gmadorell.youtube_sync.module.youtube.domain.{
+  PlayListRepository,
+  PlayListVideoRepository,
+  RemotePlayListVideoRepository,
+  VideoRepository
+}
 import com.gmadorell.youtube_sync.module.youtube.infrastructure.{
   ApiPlayListRepository,
+  ApiRemotePlayListVideoRepository,
   ApiVideoRepository,
   FilesystemPlayListVideoRepository
 }
-import net.codingwell.scalaguice.ScalaModule
 import com.google.inject.{Inject, Provider, Singleton}
+import net.codingwell.scalaguice.ScalaModule
 
 final class YoutubeGuiceModule extends ScalaModule {
   override def configure(): Unit = {
@@ -27,6 +33,8 @@ final class YoutubeGuiceModule extends ScalaModule {
     bind[VideoRepository].toProvider[ApiVideoRepositoryProvider].in[Singleton]
     bind[PlayListVideoRepository].toProvider[FilesystemPlayListVideoRepositoryProvider].in[Singleton]
     bind[YoutubeApi].toProvider[YoutubeApiProvider].in[Singleton]
+
+    bind[RemotePlayListVideoRepository].toProvider[RemotePlayListVideoRepositoryProvider].in[Singleton]
   }
 }
 
@@ -58,10 +66,15 @@ private class ApiVideoRepositoryProvider @Inject()(youtubeApi: YoutubeApi)(impli
 
 private class FilesystemPlayListVideoRepositoryProvider @Inject()(configuration: YoutubeSyncConfiguration)
     extends Provider[PlayListVideoRepository] {
-  override def get(): PlayListVideoRepository = new FilesystemPlayListVideoRepository()
+  override def get(): PlayListVideoRepository = new FilesystemPlayListVideoRepository(configuration.contentRootPath)
 }
 
 private class YoutubeApiProvider @Inject()(configuration: YoutubeSyncConfiguration)(implicit ec: ExecutionContext)
     extends Provider[YoutubeApi] {
   override def get(): YoutubeApi = new YoutubeApi(configuration.apiKey)
+}
+
+private class RemotePlayListVideoRepositoryProvider @Inject()(youtubeApi: YoutubeApi)(implicit ec: ExecutionContext)
+    extends Provider[RemotePlayListVideoRepository] {
+  override def get(): RemotePlayListVideoRepository = new ApiRemotePlayListVideoRepository(youtubeApi)
 }

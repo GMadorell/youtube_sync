@@ -1,14 +1,10 @@
 package com.gmadorell.youtube_sync.module.youtube.test.behaviour
 
-import com.gmadorell.youtube_sync.module.youtube.application.sync.{
-  SynchronizeVideoOnVideoFetchedEventHandler,
-  VideoSynchronizer
-}
+import com.gmadorell.youtube_sync.module.youtube.application.sync.{SynchronizeVideoOnVideoFetchedEventHandler, VideoSynchronizer}
 import com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub._
 
 final class SynchronizeVideoOnVideoFetchedSpec extends YoutubeBehaviourSpec {
-  private implicit val ec = scala.concurrent.ExecutionContext.global
-  val handler             = new SynchronizeVideoOnVideoFetchedEventHandler(new VideoSynchronizer(playListVideoRepository))
+  val handler = new SynchronizeVideoOnVideoFetchedEventHandler(new VideoSynchronizer(playListVideoRepository))
 
   "SynchronizeVideoOnVideoFetchedEventHandler" should {
     "create a video pertaining to a playlist if it didn't already exist" in {

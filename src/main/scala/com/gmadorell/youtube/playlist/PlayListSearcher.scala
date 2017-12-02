@@ -2,8 +2,8 @@ package com.gmadorell.youtube.playlist
 
 import scala.concurrent.Future
 
-import PlaylistsResponseMarshaller._
 import com.gmadorell.youtube.model.{ChannelId, PlayList, PlayListId, PlayListName}
+import PlaylistsResponseMarshaller._
 import com.gmadorell.youtube.shared.YoutubeRequest
 import fr.hmil.roshttp.HttpRequest
 import fr.hmil.roshttp.exceptions.HttpException
@@ -21,11 +21,8 @@ final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
       "maxResults" -> "20"
     )
 
-  def playLists(channelId: ChannelId): Future[Set[PlayList]] = {
+  def playListsByChannel(channelId: ChannelId): Future[Set[PlayList]] = {
     val requestWithChannelId = requestSkeleton.withQueryParameter("channelId", channelId.id)
-
-    def responsePlayListItemToPlaylist(responsePlaylistItem: ResponsePlaylistItem): PlayList =
-      PlayList(id = PlayListId(responsePlaylistItem.id), name = PlayListName(responsePlaylistItem.snippet.title))
 
     def iterate(previousResponse: PlaylistsResponse): Future[Set[PlayList]] = {
       previousResponse.nextPageToken match {
@@ -58,6 +55,30 @@ final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
 
     executePlayListsRequest(requestWithChannelId)
   }
+
+  def playListById(playListId: PlayListId): Future[Option[PlayList]] = {
+    val requestWithPlayListId = requestSkeleton.withQueryParameter("id", playListId.id)
+
+    requestWithPlayListId
+      .send()
+      .flatMap { response =>
+        decode[PlaylistsResponse](response.body) match {
+          case Right(playListsResponse) =>
+            val responsePlayLists = playListsResponse.items.map(responsePlayListItemToPlaylist).toSet
+            Future.successful(Some(responsePlayLists.head))
+          case Left(error) => Future.failed(error)
+        }
+      }
+      .recover {
+        case HttpException(response) =>
+          response.statusCode match {
+            case 404 => None
+          }
+      }
+  }
+
+  private def responsePlayListItemToPlaylist(responsePlaylistItem: ResponsePlaylistItem): PlayList =
+    PlayList(id = PlayListId(responsePlaylistItem.id), name = PlayListName(responsePlaylistItem.snippet.title))
 }
 
 private object PlaylistsResponseMarshaller {

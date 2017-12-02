@@ -13,8 +13,6 @@ import com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub.{
 
 final class FetchPlayListsOfChannelSpec extends YoutubeBehaviourSpec {
 
-  private implicit val ec = scala.concurrent.ExecutionContext.global
-
   "A FetchPlayListsOfChannelCommandHandler" should {
     "find the playlists of a channel" in {
       val command            = FetchPlayListsOfChannelCommandStub.random()

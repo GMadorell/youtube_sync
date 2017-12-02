@@ -4,13 +4,39 @@ import scala.concurrent.Future
 
 import com.gmadorell.bus.domain.event.EventBus
 import com.gmadorell.bus.model.event.Event
-import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, PlayListVideoRepository, VideoRepository}
+import com.gmadorell.youtube_sync.module.youtube.domain._
 import com.gmadorell.youtube_sync.module.youtube.domain.model._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, OneInstancePerTest, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
 
 trait YoutubeBehaviourSpec extends WordSpec with MockFactory with ScalaFutures with Matchers with OneInstancePerTest {
+
+  implicit val ec = scala.concurrent.ExecutionContext.global
+
+  val remotePlayListVideoRepository: RemotePlayListVideoRepository = mock[RemotePlayListVideoRepository]
+  val localPlayListVideoRepository: LocalPlayListVideoRepository   = mock[LocalPlayListVideoRepository]
+
+  def shouldFindRemotePlayListVideos(playListId: PlayListId, playListVideos: List[PlayListVideo]): Unit =
+    (remotePlayListVideoRepository.search _)
+      .expects(playListId)
+      .once()
+      .returning(Future.successful(playListVideos))
+
+  def shouldFindLocalPlayListVideos(playListId: PlayListId, playListVideos: List[PlayListVideo]): Unit =
+    (localPlayListVideoRepository.search _)
+      .expects(playListId)
+      .once()
+      .returning(Future.successful(playListVideos))
+
+  def shouldCreateLocalPlayListVideo(playListVideo: PlayListVideo): Unit =
+    (localPlayListVideoRepository.create _)
+      .expects(playListVideo)
+      .once()
+      .returning(Future.successful(()))
+
+  /////////////////////////////////////////////////////////////////////////////////
+
   val playListRepository: PlayListRepository           = mock[PlayListRepository]
   val videoRepository: VideoRepository                 = mock[VideoRepository]
   val playListVideoRepository: PlayListVideoRepository = mock[PlayListVideoRepository]

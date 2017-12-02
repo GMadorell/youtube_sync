@@ -12,6 +12,7 @@ final class YoutubeApi(private val apiKey: String)(implicit ec: ExecutionContext
   private val playListSearcher   = new PlayListSearcher(apiKey)
   private val videoSearcher      = new VideoSearcher(apiKey)
 
-  def playLists(channelId: ChannelId): Future[Set[PlayList]] = playListSearcher.playLists(channelId)
-  def videos(playListId: PlayListId): Future[Set[Video]]     = videoSearcher.videos(playListId)
+  def playLists(channelId: ChannelId): Future[Set[PlayList]]     = playListSearcher.playListsByChannel(channelId)
+  def playList(playListId: PlayListId): Future[Option[PlayList]] = playListSearcher.playListById(playListId)
+  def videos(playListId: PlayListId): Future[Set[Video]]         = videoSearcher.videos(playListId)
 }

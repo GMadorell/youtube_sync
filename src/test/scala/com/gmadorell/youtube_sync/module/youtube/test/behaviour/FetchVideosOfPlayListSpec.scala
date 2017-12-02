@@ -6,8 +6,6 @@ import com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub._
 
 final class FetchVideosOfPlayListSpec extends YoutubeBehaviourSpec {
 
-  private implicit val ec = scala.concurrent.ExecutionContext.global
-
   "A FetchVideosOnPlayListFetched" should {
     "find the videos of a playlist" in {
       val event            = PlayListFetchedStub.random()
