@@ -4,10 +4,11 @@ import scala.concurrent.duration._
 
 import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
 import com.gmadorell.youtube_sync.infrastructure.dependency_injection.YoutubeSyncGuiceModule
-import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, PlayListVideoRepository, RemotePlayListVideoRepository, VideoRepository}
+import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, RemotePlayListVideoRepository}
 import com.google.inject.{Guice, Injector}
 import net.codingwell.scalaguice.ScalaModule
 import net.codingwell.scalaguice.InjectorExtensions._
+import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.{Matchers, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
 
@@ -18,16 +19,14 @@ abstract class YoutubeSyncIntegrationTest extends IntegrationTest {
 
   def configuration(implicit injector: Injector): YoutubeSyncConfiguration =
     injector.instance[YoutubeSyncConfiguration]
-  def playListRepository(implicit injector: Injector): PlayListRepository = injector.instance[PlayListRepository]
-  def videoRepository(implicit injector: Injector): VideoRepository       = injector.instance[VideoRepository]
-  def playListVideoRepository(implicit injector: Injector): PlayListVideoRepository =
-    injector.instance[PlayListVideoRepository]
 
   def remotePlayListVideoRepository(implicit injector: Injector): RemotePlayListVideoRepository =
     injector.instance[RemotePlayListVideoRepository]
+  def playListRepository(implicit injector: Injector): PlayListRepository =
+    injector.instance[PlayListRepository]
 }
 
-abstract class IntegrationTest extends WordSpec with ScalaFutures with Matchers {
+abstract class IntegrationTest extends WordSpec with ScalaFutures with Matchers with TypeCheckedTripleEquals {
   type TestResult = Unit
   type Test       = Injector => TestResult
 

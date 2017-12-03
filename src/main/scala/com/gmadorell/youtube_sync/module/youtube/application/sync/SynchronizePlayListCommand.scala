@@ -1,4 +1,4 @@
-package com.gmadorell.youtube_sync.module.youtube.application.sync_new
+package com.gmadorell.youtube_sync.module.youtube.application.sync
 
 import com.gmadorell.bus.model.command.Command
 

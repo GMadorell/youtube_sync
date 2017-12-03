@@ -21,7 +21,7 @@ final class RemotePlayListVideoRepositoryTest extends YoutubeSyncIntegrationTest
       val expectedPlayListVideos = videos.map(video => PlayListVideoStub.create(playList, video))
 
       remotePlayListVideoRepository
-        .search(playList.id)
+        .search(playList)
         .futureValue should contain theSameElementsAs expectedPlayListVideos
     }
   }

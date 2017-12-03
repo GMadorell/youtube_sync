@@ -65,7 +65,10 @@ final class PlayListSearcher(apiKey: String)(implicit scheduler: Scheduler) {
         decode[PlaylistsResponse](response.body) match {
           case Right(playListsResponse) =>
             val responsePlayLists = playListsResponse.items.map(responsePlayListItemToPlaylist).toSet
-            Future.successful(Some(responsePlayLists.head))
+            responsePlayLists.toList match {
+              case List(playList) => Future.successful(Some(playList))
+              case Nil            => Future.successful(None)
+            }
           case Left(error) => Future.failed(error)
         }
       }
