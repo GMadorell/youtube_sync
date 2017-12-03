@@ -2,10 +2,10 @@ package com.gmadorell.youtube_sync.module.youtube.infrastructure
 
 import scala.concurrent.Future
 
-import com.gmadorell.youtube.model.{PlayListName, VideoName}
+import better.files._
 import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
 import com.gmadorell.youtube_sync.module.youtube.domain.LocalPlayListVideoRepository
-import com.gmadorell.youtube_sync.module.youtube.domain.model.{PlayList, PlayListId, PlayListVideo}
+import com.gmadorell.youtube_sync.module.youtube.domain.model._
 import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto._
 
@@ -13,24 +13,39 @@ final class FilesystemLocalPlayListVideoRepository(config: YoutubeSyncConfigurat
     extends LocalPlayListVideoRepository
     with PlayListVideoCodec {
 
-  override def search(playList: PlayList): Future[List[PlayListVideo]] =
-    ???
-//    playListDatabase()
-//      .get(playListId)
-//      .fold(Future.successful(List.empty[PlayListVideo]))(playListName =>
-//        Future.successful(List.empty[PlayListVideo]) // TODO
-//      )
+  /*
+   * Assumption:
+   *   Videos will be stored in path:
+   *     - root / playListName / videoName__videoId.mp3
+   */
+
+  override def search(playList: PlayList): Future[List[PlayListVideo]] = {
+    val directory = playListDirectory(playList.name)
+    val foundPlayListVideos = if (directory.exists) {
+      directory.children
+        .filter(_.isRegularFile)
+        .map(file => PlayListVideo(playList, deconstructFileName(file.name)))
+        .toList
+    } else {
+      List.empty
+    }
+    Future.successful(foundPlayListVideos)
+  }
 
   override def create(video: PlayListVideo): Future[Unit] = ???
 
-//  private def playListDirectory(playListN)
-//
-//  private def playListDatabase(): Map[PlayListId, PlayListName] =
-//    if (localDatabasePath.exists) {
-//      decode[Map[PlayListId, PlayListName]](localDatabasePath.contentAsString).right.get
-//    } else {
-//      Map.empty
-//    }
+  private def playListDirectory(playListName: PlayListName): File =
+    config.contentRootPath / playListName.name
+
+  private def deconstructFileName(fileName: String): Video =
+    fileName.split("__") match {
+      case Array(name, idAndExtension) => {
+        idAndExtension.split(".") match {
+          case Array(id, _) =>
+            Video(VideoId(id), VideoName(name))
+        }
+      }
+    }
 }
 
 trait PlayListVideoCodec {

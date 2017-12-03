@@ -6,10 +6,15 @@ import com.gmadorell.bus.domain.event.EventBus
 import com.gmadorell.bus.infrastructure.event.SimpleEventBus
 import com.gmadorell.youtube.YoutubeApi
 import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
-import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, RemotePlayListVideoRepository}
+import com.gmadorell.youtube_sync.module.youtube.domain.{
+  LocalPlayListVideoRepository,
+  PlayListRepository,
+  RemotePlayListVideoRepository
+}
 import com.gmadorell.youtube_sync.module.youtube.infrastructure.{
   ApiPlayListRepository,
-  ApiRemotePlayListVideoRepository
+  ApiRemotePlayListVideoRepository,
+  FilesystemLocalPlayListVideoRepository
 }
 import com.google.inject.{Inject, Provider, Singleton}
 import net.codingwell.scalaguice.ScalaModule
@@ -19,8 +24,9 @@ final class YoutubeGuiceModule extends ScalaModule {
     bind[EventBus].toProvider[SimpleEventBusProvider].in[Singleton]
     bind[YoutubeApi].toProvider[YoutubeApiProvider].in[Singleton]
 
-    bind[RemotePlayListVideoRepository].toProvider[RemotePlayListVideoRepositoryProvider].in[Singleton]
     bind[PlayListRepository].toProvider[PlayListRepositoryProvider].in[Singleton]
+    bind[RemotePlayListVideoRepository].toProvider[RemotePlayListVideoRepositoryProvider].in[Singleton]
+    bind[LocalPlayListVideoRepository].toProvider[LocalPlayListVideoRepositoryProvider].in[Singleton]
   }
 }
 
@@ -43,4 +49,10 @@ private class RemotePlayListVideoRepositoryProvider @Inject()(youtubeApi: Youtub
 private class PlayListRepositoryProvider @Inject()(youtubeApi: YoutubeApi)(implicit ec: ExecutionContext)
     extends Provider[PlayListRepository] {
   override def get(): PlayListRepository = new ApiPlayListRepository(youtubeApi)
+}
+
+private class LocalPlayListVideoRepositoryProvider @Inject()(configuration: YoutubeSyncConfiguration)(
+    implicit ec: ExecutionContext)
+    extends Provider[LocalPlayListVideoRepository] {
+  override def get(): LocalPlayListVideoRepository = new FilesystemLocalPlayListVideoRepository(configuration)
 }
