@@ -6,6 +6,8 @@ Configuration.commonSettings
 
 resourceDirectory in Compile := baseDirectory.value / "conf"
 
+parallelExecution in Test := false  // Run tests sequentially
+
 libraryDependencies ++= Dependencies.prod
 libraryDependencies ++= Dependencies.test
 
