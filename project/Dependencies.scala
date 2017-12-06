@@ -3,13 +3,14 @@ import sbt._
 object Dependencies {
   object Version {
     val betterFiles    = "2.17.1"
-    val circe          = "0.7.0-M2"
+    val circe          = "0.9.0-M2"
     val pprint         = "0.4.3"
     val rosHttp        = "2.0.1"
     val scalaGuice     = "4.1.0"
     val scalaMock      = "3.4.2"
     val scalaTest      = "2.2.4"
     val typesafeConfig = "1.2.1"
+    val cats           = "1.0.0-RC1"
   }
 
   private val betterFiles    = "com.github.pathikrit" %% "better-files"                % Version.betterFiles
@@ -22,8 +23,9 @@ object Dependencies {
   private val scalaGuice     = "net.codingwell"       %% "scala-guice"                 % Version.scalaGuice
   private val scalaTest      = "org.scalatest"        %% "scalatest"                   % Version.scalaTest
   private val typesafeConfig = "com.typesafe"         % "config"                       % Version.typesafeConfig
+  private val catsCore       = "org.typelevel"        %% "cats-core"                   % Version.cats
 
-  val compile = Seq(
+  val prod = Seq(
     betterFiles,
     circeCore,
     circeParser,
@@ -31,7 +33,8 @@ object Dependencies {
     pprint,
     roshttp,
     scalaGuice,
-    typesafeConfig
+    typesafeConfig,
+    catsCore
   )
 
   val test = Seq(

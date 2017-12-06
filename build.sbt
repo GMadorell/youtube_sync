@@ -6,7 +6,7 @@ Configuration.commonSettings
 
 resourceDirectory in Compile := baseDirectory.value / "conf"
 
-libraryDependencies ++= Dependencies.compile
+libraryDependencies ++= Dependencies.prod
 libraryDependencies ++= Dependencies.test
 
 // Scalafmt

@@ -2,8 +2,8 @@ package com.gmadorell.youtube_sync.module.youtube.domain
 
 import scala.concurrent.Future
 
-import com.gmadorell.youtube_sync.module.youtube.domain.model.{ChannelId, PlayList}
+import com.gmadorell.youtube_sync.module.youtube.domain.model.{PlayList, PlayListId}
 
 trait PlayListRepository {
-  def findPlayLists(channelId: ChannelId): Future[Set[PlayList]]
+  def search(playListId: PlayListId): Future[Option[PlayList]]
 }

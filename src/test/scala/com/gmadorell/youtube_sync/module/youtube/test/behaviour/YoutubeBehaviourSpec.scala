@@ -2,56 +2,47 @@ package com.gmadorell.youtube_sync.module.youtube.test.behaviour
 
 import scala.concurrent.Future
 
-import com.gmadorell.bus.domain.event.EventBus
-import com.gmadorell.bus.model.event.Event
-import com.gmadorell.youtube_sync.module.youtube.domain.{PlayListRepository, PlayListVideoRepository, VideoRepository}
+import com.gmadorell.youtube_sync.module.youtube.domain._
 import com.gmadorell.youtube_sync.module.youtube.domain.model._
 import org.scalamock.scalatest.MockFactory
 import org.scalatest.{Matchers, OneInstancePerTest, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
 
 trait YoutubeBehaviourSpec extends WordSpec with MockFactory with ScalaFutures with Matchers with OneInstancePerTest {
-  val playListRepository: PlayListRepository           = mock[PlayListRepository]
-  val videoRepository: VideoRepository                 = mock[VideoRepository]
-  val playListVideoRepository: PlayListVideoRepository = mock[PlayListVideoRepository]
-  val eventBus: EventBus                               = mock[EventBus]
 
-  def shouldFindPlayListsOfChannel(channelId: ChannelId, playListsOfChannel: Set[PlayList]): Unit = {
-    (playListRepository.findPlayLists _)
-      .expects(channelId)
-      .once()
-      .returning(Future.successful(playListsOfChannel))
-  }
+  implicit val ec = scala.concurrent.ExecutionContext.global
 
-  def shouldFindVideosOfPlayList(playListId: PlayListId, videos: Set[Video]): Unit = {
-    (videoRepository.findVideos _)
+  val playListRepository: PlayListRepository                       = mock[PlayListRepository]
+  val remotePlayListVideoRepository: RemotePlayListVideoRepository = mock[RemotePlayListVideoRepository]
+  val localPlayListVideoRepository: LocalPlayListVideoRepository   = mock[LocalPlayListVideoRepository]
+
+  def shouldFindPlayList(playListId: PlayListId, playList: PlayList): Unit =
+    (playListRepository.search _)
       .expects(playListId)
       .once()
-      .returning(Future.successful(videos))
-  }
+      .returning(Future.successful(Some(playList)))
 
-  def shouldPublishEvent(event: Event): Unit = {
-    (eventBus.handle _)
-      .expects(event)
+  def shouldNotFindPlayList(playListId: PlayListId): Unit =
+    (playListRepository.search _)
+      .expects(playListId)
       .once()
-      .returning(Right(Future.successful(())))
-  }
+      .returning(Future.successful(None))
 
-  def playListVideoShouldExist(playList: PlayList, video: Video): Unit =
-    (playListVideoRepository.exists _)
-      .expects(playList, video)
+  def shouldFindRemotePlayListVideos(playList: PlayList, playListVideos: List[PlayListVideo]): Unit =
+    (remotePlayListVideoRepository.search _)
+      .expects(playList)
       .once()
-      .returning(Future.successful(true))
+      .returning(Future.successful(playListVideos))
 
-  def playListVideoShouldNotExist(playList: PlayList, video: Video): Unit =
-    (playListVideoRepository.exists _)
-      .expects(playList, video)
+  def shouldFindLocalPlayListVideos(playList: PlayList, playListVideos: List[PlayListVideo]): Unit =
+    (localPlayListVideoRepository.search _)
+      .expects(playList)
       .once()
-      .returning(Future.successful(false))
+      .returning(Future.successful(playListVideos))
 
-  def shouldCreatePlayListVideo(playList: PlayList, video: Video): Unit =
-    (playListVideoRepository.create _)
-      .expects(playList, video)
+  def shouldCreateLocalPlayListVideo(playListVideo: PlayListVideo): Unit =
+    (localPlayListVideoRepository.create _)
+      .expects(playListVideo)
       .once()
       .returning(Future.successful(()))
 }

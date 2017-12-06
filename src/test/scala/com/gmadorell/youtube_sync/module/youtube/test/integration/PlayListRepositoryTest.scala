@@ -1,28 +1,24 @@
 package com.gmadorell.youtube_sync.module.youtube.test.integration
 
 import com.gmadorell.youtube_sync.infrastructure.integration.YoutubeSyncIntegrationTest
-import com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub.{
-  ChannelIdStub,
-  PlayListIdStub,
-  PlayListNameStub,
-  PlayListStub
-}
+import com.gmadorell.youtube_sync.module.youtube.test.infrastructure.stub._
 
 final class PlayListRepositoryTest extends YoutubeSyncIntegrationTest {
   "A PlayListRepository" should {
-    "obtain the play lists of a given channelId" in runWithInjector { implicit injector =>
-      val channelId = ChannelIdStub.create(configuration.test.dummyChannelId)
-      val playLists = configuration.test.playLists
-        .map(playListConfig =>
-          PlayListStub.create(id = PlayListIdStub.create(playListConfig.playListId),
-                              name = PlayListNameStub.create(playListConfig.name)))
-        .toSet
+    "find existing playlist" in runWithInjector { implicit injector =>
+      val playList = configuration.test.playLists
+        .map(testPlayList =>
+          PlayListStub.create(PlayListIdStub.create(testPlayList.playListId),
+                              PlayListNameStub.create(testPlayList.name)))
+        .head
 
-      playListRepository.findPlayLists(channelId).futureValue should contain theSameElementsAs playLists
+      playListRepository.search(playList.id).futureValue should ===(Some(playList))
     }
 
-    "not find any playlist in an invented channel" in runWithInjector { implicit injector =>
-      playListRepository.findPlayLists(ChannelIdStub.random()).futureValue shouldBe Set()
+    "not find unexisting playlist" in runWithInjector { implicit injector =>
+      val playListId = PlayListIdStub.create()
+
+      playListRepository.search(playListId).futureValue should ===(None)
     }
   }
 }

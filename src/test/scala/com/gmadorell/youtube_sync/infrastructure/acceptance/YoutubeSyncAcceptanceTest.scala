@@ -5,7 +5,6 @@ import scala.concurrent.duration._
 import com.gmadorell.bus.domain.event.EventBus
 import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
 import com.gmadorell.youtube_sync.infrastructure.dependency_injection.YoutubeSyncGuiceModule
-import com.gmadorell.youtube_sync.module.youtube.domain.PlayListVideoRepository
 import com.google.inject.{Guice, Injector}
 import net.codingwell.scalaguice.ScalaModule
 import net.codingwell.scalaguice.InjectorExtensions._
@@ -20,8 +19,6 @@ abstract class YoutubeSyncAcceptanceTest extends AcceptanceTest {
   def configuration(implicit injector: Injector): YoutubeSyncConfiguration =
     injector.instance[YoutubeSyncConfiguration]
   def eventBus(implicit injector: Injector): EventBus = injector.instance[EventBus]
-  def playListVideoRepository(implicit injector: Injector): PlayListVideoRepository =
-    injector.instance[PlayListVideoRepository]
 }
 
 abstract class AcceptanceTest extends WordSpec with ScalaFutures with Matchers {
