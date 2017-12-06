@@ -1,0 +1,27 @@
+test {
+  dummy-user {
+    channel-id = "FILL_ME_UP"
+    playlists = [
+      {
+        id = "FILL_ME_UP",
+        name = "FILL_ME_UP",
+        videos = [
+          {
+            id = "FILL_ME_UP"
+            name = "FILL_ME_UP"
+          }
+        ]
+      },
+      {
+        id = "FILL_ME_UP",
+        name = "FILL_ME_UP",
+        videos = [
+          {
+            id = "FILL_ME_UP"
+            name = "FILL_ME_UP"
+          }
+        ]
+      }
+    ],
+  }
+}
