@@ -13,7 +13,7 @@ final class LocalPlayListVideoRepositoryTest extends YoutubeSyncIntegrationTest 
       localPlayListVideoRepository.search(PlayListStub.create()).futureValue should ===(List.empty)
     }
 
-    "find existing PlayListVideos" ignore runWithInjector { implicit injector =>
+    "find existing PlayListVideos" in runWithInjector { implicit injector =>
       implicit val ec: ExecutionContext = executionContext
 
       val playListToVideos = configuration.test.playLists.toList.map { playListConfiguration =>

@@ -1,17 +1,15 @@
 package com.gmadorell.youtube_sync.module.youtube.infrastructure
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.sys.process._
 
 import better.files._
 import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
 import com.gmadorell.youtube_sync.module.youtube.domain.LocalPlayListVideoRepository
 import com.gmadorell.youtube_sync.module.youtube.domain.model._
-import io.circe.{Decoder, Encoder}
-import io.circe.generic.semiauto._
 
-final class FilesystemLocalPlayListVideoRepository(config: YoutubeSyncConfiguration)
-    extends LocalPlayListVideoRepository
-    with PlayListVideoCodec {
+final class FilesystemLocalPlayListVideoRepository(config: YoutubeSyncConfiguration)(implicit ec: ExecutionContext)
+    extends LocalPlayListVideoRepository {
 
   /*
    * Assumption:
@@ -32,29 +30,36 @@ final class FilesystemLocalPlayListVideoRepository(config: YoutubeSyncConfigurat
     Future.successful(foundPlayListVideos)
   }
 
-  override def create(video: PlayListVideo): Future[Unit] = ???
+  override def create(playListVideo: PlayListVideo): Future[Unit] = Future {
+    val youtubeUrl                = s"https://www.youtube.com/watch?v=${playListVideo.video.id.id}"
+    val youtubeDLFileNameTemplate = constructFileName(playListVideo.video).replace(".mp3", ".%(ext)s")
+    val downloadPath              = playListDirectory(playListVideo.playList.name) / youtubeDLFileNameTemplate
+    val youtubeDLCommand =
+      Seq("youtube-dl",
+          "--extract-audio",
+          "--audio-format=mp3",
+          s"--output=${downloadPath.path.toString}",
+          s"$youtubeUrl")
+    val process    = Process(youtubeDLCommand)
+    val statusCode = process.!(ProcessLogger.apply(string => println(string)))
+    if (statusCode != 0) {
+      throw YoutubeDLException(
+        s"Youtube DL failed to download playListVideo: ($playListVideo), statusCode: $statusCode")
+    }
+  }
 
   private def playListDirectory(playListName: PlayListName): File =
     config.contentRootPath / playListName.name
 
-  private def deconstructFileName(fileName: String): Video =
-    fileName.split("__") match {
-      case Array(name, idAndExtension) => {
-        idAndExtension.split(".") match {
-          case Array(id, _) =>
-            Video(VideoId(id), VideoName(name))
-        }
-      }
+  private def deconstructFileName(fileName: String): Video = {
+    val fileNameRegex = """(.*)__(.*)\.mp3""".r
+    fileName match {
+      case fileNameRegex(videoName, videoId) => Video(VideoId(videoId), VideoName(videoName))
     }
+  }
+
+  private def constructFileName(video: Video): String =
+    s"${video.name.name}__${video.id.id}.mp3"
 }
 
-trait PlayListVideoCodec {
-  implicit val playListIdDecoder: Decoder[PlayListId] = deriveDecoder[PlayListId]
-  implicit val playListIdEncoder: Encoder[PlayListId] = deriveEncoder[PlayListId]
-
-  implicit val playListNameDecoder: Decoder[PlayListName] = deriveDecoder[PlayListName]
-  implicit val playListNameEncoder: Encoder[PlayListName] = deriveEncoder[PlayListName]
-
-  implicit val videoNameDecoder: Decoder[VideoName] = deriveDecoder[VideoName]
-  implicit val videoNameEncoder: Encoder[VideoName] = deriveEncoder[VideoName]
-}
+final case class YoutubeDLException(message: String) extends RuntimeException(message)
