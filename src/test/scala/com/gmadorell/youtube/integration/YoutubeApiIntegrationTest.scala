@@ -15,6 +15,6 @@ trait YoutubeApiIntegrationTest
     with TypeCheckedTripleEquals {
   implicit val ec = scala.concurrent.ExecutionContext.global
 
-  val config     = new YoutubeTestConfiguration(ConfigFactory.load("application.conf"))
+  val config     = new YoutubeTestConfiguration(ConfigFactory.load("test.conf"))
   val youtubeApi = new YoutubeApi(config.apiKey)
 }

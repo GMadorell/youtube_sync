@@ -4,7 +4,7 @@ import scala.concurrent.ExecutionContext
 
 import better.files._
 import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
-import com.gmadorell.youtube_sync.infrastructure.dependency_injection.YoutubeSyncModule
+import com.gmadorell.youtube_sync.infrastructure.dependency_injection.{TestYoutubeSyncModule, YoutubeSyncModule}
 import com.gmadorell.youtube_sync.module.synchronize.domain.{
   LocalPlayListVideoRepository,
   PlayListRepository,
@@ -16,7 +16,7 @@ import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 
 abstract class YoutubeSyncIntegrationTest extends IntegrationTest[YoutubeSyncModule] {
 
-  override def context(): YoutubeSyncModule = new YoutubeSyncModule
+  override def context(): YoutubeSyncModule = new TestYoutubeSyncModule()
 
   override def cleanupBeforeTest(context: YoutubeSyncModule): TestResult = {
     val contentRootDirectory = File(context.configuration.contentRootPath)
@@ -53,7 +53,9 @@ abstract class IntegrationTest[Context]
     val newContext = context()
     cleanupBeforeTest(newContext)
     testToExecute(newContext)
+    cleanupAfterTest(newContext)
   }
 
   def cleanupBeforeTest(context: Context): Unit = {}
+  def cleanupAfterTest(context: Context): Unit  = {}
 }

@@ -10,6 +10,8 @@ object Dependencies {
     val scalaTest      = "2.2.4"
     val typesafeConfig = "1.2.1"
     val cats           = "1.0.0-RC1"
+    val akka           = "2.5.7"
+    val akron          = "1.2"
   }
 
   private val betterFiles    = "com.github.pathikrit" %% "better-files"                % Version.betterFiles
@@ -22,6 +24,8 @@ object Dependencies {
   private val scalaTest      = "org.scalatest"        %% "scalatest"                   % Version.scalaTest
   private val typesafeConfig = "com.typesafe"         % "config"                       % Version.typesafeConfig
   private val catsCore       = "org.typelevel"        %% "cats-core"                   % Version.cats
+  private val akkaActor      = "com.typesafe.akka"    %% "akka-actor"                  % Version.akka
+  private val akron          = "com.markatta"         %% "akron"                       % Version.akron
 
   val prod = Seq(
     betterFiles,
@@ -31,7 +35,9 @@ object Dependencies {
     pprint,
     roshttp,
     typesafeConfig,
-    catsCore
+    catsCore,
+    akkaActor,
+    akron
   )
 
   val test = Seq(
