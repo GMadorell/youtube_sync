@@ -1,32 +1,46 @@
 package com.gmadorell.youtube_sync.infrastructure.acceptance
 
-import scala.concurrent.duration._
+import scala.concurrent.ExecutionContext
 
-import com.gmadorell.bus.domain.event.EventBus
 import com.gmadorell.youtube_sync.infrastructure.configuration.YoutubeSyncConfiguration
-import com.gmadorell.youtube_sync.infrastructure.dependency_injection.YoutubeSyncGuiceModule
-import com.google.inject.{Guice, Injector}
-import net.codingwell.scalaguice.ScalaModule
-import net.codingwell.scalaguice.InjectorExtensions._
+import com.gmadorell.youtube_sync.infrastructure.dependency_injection.YoutubeSyncModule
+import com.gmadorell.youtube_sync.module.synchronize.domain.{
+  LocalPlayListVideoRepository,
+  PlayListRepository,
+  RemotePlayListVideoRepository
+}
+import org.scalactic.TypeCheckedTripleEquals
 import org.scalatest.{Matchers, WordSpec}
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 
-abstract class YoutubeSyncAcceptanceTest extends AcceptanceTest {
-  override def baseModule: ScalaModule = new YoutubeSyncGuiceModule
+abstract class YoutubeSyncAcceptanceTest extends IntegrationTest[YoutubeSyncModule] {
 
-  override implicit def patienceConfig: PatienceConfig = PatienceConfig(10.seconds)
+  override def context: YoutubeSyncModule = new YoutubeSyncModule
 
-  def configuration(implicit injector: Injector): YoutubeSyncConfiguration =
-    injector.instance[YoutubeSyncConfiguration]
-  def eventBus(implicit injector: Injector): EventBus = injector.instance[EventBus]
+  def configuration(implicit module: YoutubeSyncModule): YoutubeSyncConfiguration =
+    module.configuration
+
+  def executionContext(implicit context: YoutubeSyncModule): ExecutionContext =
+    context.ec
+  def playListRepository(implicit context: YoutubeSyncModule): PlayListRepository =
+    context.synchronizeModule.playListRepository
+  def remotePlayListVideoRepository(implicit context: YoutubeSyncModule): RemotePlayListVideoRepository =
+    context.synchronizeModule.remotePlayListVideoRepository
+  def localPlayListVideoRepository(implicit context: YoutubeSyncModule): LocalPlayListVideoRepository =
+    context.synchronizeModule.localPlayListVideoRepository
 }
 
-abstract class AcceptanceTest extends WordSpec with ScalaFutures with Matchers {
+abstract class IntegrationTest[Context]
+    extends WordSpec
+    with ScalaFutures
+    with Matchers
+    with TypeCheckedTripleEquals
+    with IntegrationPatience {
   type TestResult = Unit
-  type Test       = Injector => TestResult
+  type Test       = Context => TestResult
 
-  def baseModule: ScalaModule
+  def context: Context
 
-  def runWithInjector(testToExecute: Test): TestResult =
-    testToExecute(Guice.createInjector(baseModule))
+  def runWithContext(testToExecute: Test): TestResult =
+    testToExecute(context)
 }
