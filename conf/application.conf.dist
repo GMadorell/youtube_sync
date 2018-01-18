@@ -4,7 +4,6 @@ file-system {
 }
 
 context {
-  channels = []
   playlists = []
 }
 
